@@ -1,0 +1,121 @@
+//----------------------------------------------------------------------------------------
+// 
+//		OLEInterfaces.odl: 	Interfaces definitions library		
+//		Description		 :	This file contain commun interfaces definitions. These
+//						    interfaces may be used in differents COM classes. This is
+//						    the first level of re-utilization.
+//---------------------------------------------------------------------------------------- 	
+[ 
+uuid(A4D78B20-6E05-1069-8758-08002B2BD64F),  // <- note: recreate a new ID
+version(1.0),
+lcid(0x0000),
+helpstring("This library contains OLE interfaces definition")
+] 
+library OLEInterfaces
+{
+	// Imports
+	importlib("stdole32.tlb");
+	importlib("WTypes.tlb");
+
+	//=======================================================================================
+	// IClassFactory Interface 
+	//=======================================================================================
+	[ 	
+	uuid(990BA900-F45E-11cd-8C3D-00AA004AB3B7),	// <- recreate a new ID
+	helpstring("Definition of interface IClassFactory"),
+	odl
+	] 
+	interface IClassFactory : IUnknown
+	{
+	// //IClassFactory members
+    [helpstring("Create instance object from class defined in this module")] 		
+		HRESULT CreateInstance(	[in]LPUNKNOWN pUnkOuter, 	// Points to the controlling IUnknown interface if the object 
+			    									  		// is being created as part of an aggregate. If the object is not 
+			    									  		// part of an aggregate, it is NULL
+			    				[in] REFIID riid, 			// Identifies the interface by which the caller will 
+			    											// communicate with the resulting object and through 
+			    											// the object.
+			    				[out]LPVOID *ppv);			// Points to where the pointer to the object will be 
+			    											// returned. If an error is returned, this parameter must be set to NULL.
+	[helpstring("Lock this class server")] 		
+		HRESULT LockServer([in]BOOL fLock); 				// Specifies the lock count. If TRUE, it increments 
+			    											// the lock count and locks the application in memory; 
+			    											// if FALSE, it decrements the lock count.
+	}// end of interface IClassFactory definition
+
+	//=======================================================================================
+	// IPersist Interface 
+	//=======================================================================================
+	[ 	
+	uuid(0000010c-0000-0000-C000-000000000046),
+	helpstring("Definition of IPersist interface "),
+	odl
+	] 
+	interface IPersist : IUnknown
+	{
+	[helpstring("Get CLSID from this component")] 		
+		HRESULT GetClassID([out]LPCLSID pclsid);			// Points to where to return the CLSID. The returned
+															// CLSID can be used to locate and dynamically load object-
+															// specific code into the caller's context
+	}// end of interface IPersist definition
+
+
+
+  	//=======================================================================================
+	// IPersistStream Interface 
+	//=======================================================================================
+	[ 	
+	uuid(00000109-0000-0000-C000-000000000046),	
+	helpstring("Definition of interface IPersisStream"),
+	odl
+	] 
+	interface IPersistStream : IPersist
+	{
+	[helpstring("Check an object for changes since it was last saved")] 		
+        HRESULT IsDirty(void);
+    [helpstring("Initialize an object previously stored with")]				
+        HRESULT Load([in]LPSTREAM pStm);
+    [helpstring("Save the state of an object to the indicated stream")]				
+        HRESULT Save([in]LPSTREAM pStm, [in]BOOL fClearDirty);
+	[helpstring("Determines an upper boundary for the size of the stream that would be needed to save the object")]				
+        HRESULT GetSizeMax([out]ULARGE_INTEGER* pcbSize);
+	}// end of interface IPersistStream definition
+
+	
+	/*>>>>>>>>>>>>>>>>> Interface not found in registry in Win95 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<
+	//=======================================================================================
+	// IPersistStreamInit Interface 
+	//=======================================================================================
+	[ 	
+	uuid(990BA900-F45E-11cd-8C3D-00AA004AB3B9),	// <- recreate a new ID
+	helpstring("Definition of interface IPersisStream"),
+	odl
+	] 
+	interface IPersistStreamInit : IPersistStream
+	{
+	[helpstring("Initialize the object after creation, used to set initial state")] 		
+        HRESULT InitNew(void);
+	}// end of interface IPersistStreamInit definition
+	>>>>>>>>>>>>>>>>> Interface not found in registry in Win95 <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/
+
+	/* >>>>>>>>>>>>>>>>>>>>>>>>>>>>> In construction <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<< 
+ 	//=======================================================================================
+	// IStream Interface 
+	//=======================================================================================
+	[ 	
+	uuid(980BA900-F45E-11cd-8C3D-00AA004AB3B1),	// <- recreate a new ID
+	helpstring("Definition of IStream interface "),
+	odl
+	] 
+	interface IStream : IUnknown
+	 	{
+		[helpstring("Read data from the stream starting at the current seek pointer")] 		
+		HRESULT Read(	[in]LPVOID pv,		// Point to the buffer into which the stream data should be stored 
+						[in]ULONG cb, 		// Specifies the number of bytes of data to read from the stream				
+						[in]ULONG* pcbRead);// Points (after the call) to the number of bytes actually read from
+											// the stream. It can be NULL, indicating the caller is not interested
+											// in this value
+		// >>>>>>>>>> A completer
+		}// end of interface IStream definition
+	>>>>>>>>>>>>>>>>>>>>>>>>>>>>> In construction <<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<*/ 
+ }// end of library definition

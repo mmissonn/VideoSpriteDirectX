@@ -1,0 +1,196 @@
+//----------------------------------------------------------------------------------------
+// 
+//		WTypes.odl	     : 	Window types library		
+//		Description		 :	This file contain commun interfaces definitions. These
+//						    interfaces may be used in differents COM classes. This is
+//						    the first level of re-utilization.
+//---------------------------------------------------------------------------------------- 	
+[ 
+uuid(522EAF21-CB4B-11ce-A1EC-444553540000),
+version(1.0),
+lcid(0x0000),
+helpstring("This library contains frameworks interfaces definition")
+] 
+library WindowTypes
+{
+	//---------------------------------------------------------------------------------------
+	// general type definitions
+	//---------------------------------------------------------------------------------------
+	typedef [public]unsigned long DWORD;
+	typedef [public]long BOOL;
+	typedef [public]unsigned short WORD;
+    typedef [public]unsigned char BYTE;
+    typedef [public]long LONG;
+	typedef [public]unsigned long ULONG;
+	typedef [public]double DWORDLONG;
+	typedef [public]void *HANDLE;
+	typedef [public]HANDLE HPALETTE;
+    typedef [public]HANDLE HDC;
+	typedef [public]HANDLE *HMENU;
+	typedef [public]HANDLE *WND;
+	typedef [public]DWORD COLORREF;
+	typedef [public]void *LPVOID;
+   	typedef [public]void *LPUNKNOWN;
+	typedef [public]void *LPSTREAM;		
+	typedef [public]char *LPCTSTR;
+	typedef [public]char *LPCSTR;
+	typedef [public]void *PAVISTREAM;
+	typedef [public]void *LPDSBUFFERDESC;
+	typedef [public]void *LPDIRECTSOUNDBUFFER;
+	typedef [public]void *LPDDSURFACEDESC;
+	typedef [public]void *LPDIRECTDRAWSURFACE;
+	typedef [public]void *LPDIRECTDRAWPALETTE;
+	
+	
+
+
+	typedef struct _RECT
+	{
+	    LONG    left;
+	    LONG    top;
+	    LONG    right;
+	    LONG    bottom;
+	} tagRECT;	
+
+	typedef [public] tagRECT RECT;
+
+	typedef struct _tagAVISTREAMINFO 
+			{
+		    DWORD		fccType;
+		    DWORD       fccHandler;
+		    DWORD       dwFlags;        /* Contains AVITF_* flags */
+		    DWORD		dwCaps;
+		    WORD		wPriority;
+		    WORD		wLanguage;
+		    DWORD       dwScale;
+		    DWORD       dwRate; /* dwRate / dwScale == samples/second */
+		    DWORD       dwStart;
+		    DWORD       dwLength; /* In units above... */
+		    DWORD		dwInitialFrames;
+		    DWORD       dwSuggestedBufferSize;
+		    DWORD       dwQuality;
+		    DWORD       dwSampleSize;
+		    RECT        rcFrame;
+		    DWORD		dwEditCount;
+		    DWORD		dwFormatChangeCount;
+		    char		szName[64];
+			} tagAVISTREAMINFO;
+	typedef [public] tagAVISTREAMINFO AVISTREAMINFO; 
+
+
+	typedef struct _tagAVIFILEINFO 
+			{
+		    DWORD		dwMaxBytesPerSec;	// max. transfer rate
+		    DWORD		dwFlags;		// the ever-present flags
+		    DWORD		dwCaps;
+		    DWORD		dwStreams;
+		    DWORD		dwSuggestedBufferSize;
+
+		    DWORD		dwWidth;
+		    DWORD		dwHeight;
+
+		    DWORD		dwScale;	
+		    DWORD		dwRate;	/* dwRate / dwScale == samples/second */
+		    DWORD		dwLength;
+
+		    DWORD		dwEditCount;
+
+		    char		szFileType[64];		// descriptive string for file type?
+			} tagAVIFILEINFO;
+	typedef [public] tagAVIFILEINFO AVIFILEINFO; 
+
+
+    typedef	struct _tagULARGE_INTEGER 
+    		{
+        	DWORD LowPart;
+        	DWORD HighPart;
+   			} tagULARGE_INTEGER;
+
+	typedef [public]tagULARGE_INTEGER ULARGE_INTEGER;
+	
+	//-------------------------------------------------------------------------
+	// Window Creation structure definitions	
+	//-------------------------------------------------------------------------
+
+	typedef struct _tagCREATESTRUCT 
+	{ // cs  
+    	LPVOID lpCreateParams;  
+    	HANDLE hInstance;       
+    	HMENU  hMenu;           
+    	WND   hwndParent;      
+    	int    cy;              
+    	int    cx;              
+    	int    y;               
+    	int    x;               
+    	LONG   style;           
+    	LPCTSTR lpszName;        
+    	LPCTSTR lpszClass;       
+    	DWORD  dwExStyle;       
+	} tagCREATESTRUCT;
+	
+	typedef[public]tagCREATESTRUCT CREATESTRUCT;
+
+	//-------------------------------------------------------------------------
+	// Device Independent Bitmap definitions	
+	//-------------------------------------------------------------------------
+	typedef struct _tagRGBQUAD 
+		{
+        BYTE    rgbBlue;
+        BYTE    rgbGreen;
+        BYTE    rgbRed;
+        BYTE    rgbReserved;
+		} tagRGBQUAD;
+	typedef[public]tagRGBQUAD RGBQUAD;
+
+	typedef struct _tagBITMAPINFOHEADER
+		{
+        DWORD      biSize;
+        LONG       biWidth;
+        LONG       biHeight;
+        WORD       biPlanes;
+        WORD       biBitCount;
+        DWORD      biCompression;
+        DWORD      biSizeImage;
+        LONG       biXPelsPerMeter;
+        LONG       biYPelsPerMeter;
+        DWORD      biClrUsed;
+        DWORD      biClrImportant;
+		} tagBITMAPINFOHEADER;
+	typedef[public]tagBITMAPINFOHEADER BITMAPINFOHEADER;
+
+	typedef struct _tagBITMAPINFO 
+		{
+    	BITMAPINFOHEADER    bmiHeader;
+    	RGBQUAD             bmiColors[1];
+		} tagBITMAPINFO;
+	typedef[public]tagBITMAPINFO BITMAPINFO;
+
+	//-------------------------------------------------------------------------
+	// CLSID and OID definitions	
+	//-------------------------------------------------------------------------
+
+	typedef struct _tagGUID // Structure used to define general use IDs
+    {
+        DWORD Data1;
+        WORD  Data2;
+        WORD  Data3;
+        BYTE  Data4[8];
+    } tagGUID;
+    
+	typedef [public]tagGUID GUID;
+	typedef [public]GUID 	CLSID;
+	typedef [public]CLSID*  LPCLSID;
+	typedef [public]GUID 	IID;
+	typedef [public]GUID* 	REFGUID;
+	typedef [public]IID* 	REFIID;
+	typedef [public]CLSID* 	REFCLSID;
+    
+	typedef struct _tagOBJECTID     // NOTE!! Order of structure members is important for OFS
+    {                               // enumeration.
+        GUID Lineage;               // Unique for objects copied from same original and copies of.
+        unsigned long Uniquifier;   // Random, to provide uniqueness within small set with same
+    } TagOBJECTID;                     // lineage id.
+	
+	typedef [public]TagOBJECTID OBJECTID;
+
+}; // end of library definition				  

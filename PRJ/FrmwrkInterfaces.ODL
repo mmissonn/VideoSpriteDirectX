@@ -1,0 +1,730 @@
+//----------------------------------------------------------------------------------------
+// 
+//		Interfaces.odl	 : 	Interfaces definitions library		
+//		Description		 :	This file contain commun interfaces definitions. These
+//						    interfaces may be used in differents COM classes. This is
+//						    the first level of re-utilization.
+//---------------------------------------------------------------------------------------- 	
+[ 
+uuid(547DA320-C764-11ce-A1EC-444553540000), 
+version(1.0),
+lcid(0x0000),
+helpstring("This library contains frameworks interfaces definition")
+] 
+library FrameworkInterfaces
+{
+	// Imports
+	importlib("stdole32.tlb");
+	importlib("WTypes.tlb");
+	importlib("OleInterfaces.tlb");
+    
+	//---------------------------------------------------------------------------------------
+	// general type definitions
+	//---------------------------------------------------------------------------------------
+		typedef [public]BITMAPINFOHEADER* LPDIB; // WinG PDIB definition    
+    	typedef struct _INSTANCEID
+    		{
+        	CLSID CodeSection;          // Class ID of code section 
+        	unsigned long DataSection;  // Unique Data section identifier
+        	LPUNKNOWN InterfacePointer; // IUnknown Interface pointer
+    		}INSTANCEID;
+	
+	typedef enum {POINTER, SELECT, GRABBER, MENU, RECTANGLESELECTOR} CURSOR ;
+	typedef enum { DECREASE = 0, DECREASEFIXED = 1, INCREASE = 2, INCREASEFIXED = 3 } DS_ORDER_LEAF;
+
+	typedef struct _WINDOWPARAM
+	    {
+	    int Height;             // Window Height in pixel units 
+	    int Width;              // Window Width in pixel units
+	    int XPos;               // Window horizontal position in pixel units from screen upper left (0,0)
+	    int YPos;               // Window vertical position in pixel units from screen upper left (0,0)
+	    CURSOR CursorMode;	    // Window actual cursor mode
+	    HDC ScreenBufferDC;     // Screen buffer device context
+	    LPDIB ScreenBuffer;     // pointer to screen buffer (the screen buffer is a Device Independant Bitmap)
+	    }WINDOWPARAM;
+	typedef WINDOWPARAM *LPWINDOWPARAM;
+
+	typedef struct _BOUNDRECT 
+		{
+		LONG	XPos;			// Boundary rectangle horizontal position
+		LONG	YPos;			// Boundary rectangle vertical position
+		LONG	Width;			// Boundary rectangle width
+		LONG	Height;			// Boundary rectangle height
+		}BOUNDRECT;
+	typedef BOUNDRECT* LPBOUNDRECT;
+
+	
+	//=======================================================================================
+	// Interface ISurface
+	//=======================================================================================
+	[ 	
+	uuid(98A12AE0-CDEF-11ce-B74F-A6CC4F1CF934),
+	helpstring("Definition of interface ISurface"),
+	odl
+	] 
+    interface ISurface: IUnknown	
+    {
+	[helpstring("Get surface bits")]
+		HRESULT GetSurfaceBits( [out] LPDIB* ppDIB );
+	[helpstring("Get key color associated with surface")]
+		HRESULT GetColorKey( [out] COLORREF* KeyColor);
+	}// end of interface ISurface
+	typedef ISurface *LPSURFACE;
+
+	//=======================================================================================
+	// ILinkComponent Interface 
+	// 			Comments:
+	//					This interface is used to link any type of component to a COM object.
+	//=======================================================================================
+	[ 	
+	uuid(3E596402-CD70-11ce-A1EC-444553540000),
+	helpstring("Definition of interface ILinkComponent"),
+	odl
+	] 
+	interface ILinkComponent : IUnknown
+	{
+	[helpstring("link to this component an other one and cache it's interface pointer")] 		
+		HRESULT Link([in]LPVOID pInterface); 	// Pointer to an interface. This interface is kept as an interface cache
+												// for further references. 
+	[helpstring("unlink the previously linked component")] 		
+		HRESULT Unlink(void);
+	}// end of interface ILinkComponent definition
+	typedef ILinkComponent *LPLINKCOMPONENT;   
+
+
+
+	//=======================================================================================
+	// IAVIDDSurfaceStream Interface 
+	// 			Comments:
+	//					This interface is used to access a video stream using DirectDraw
+	//=======================================================================================
+	[ 	
+	uuid(0C6E5C62-017E-11cf-B750-444553540000),
+	helpstring("Definition of interface IAVIDDSurfaceStream"),
+	odl
+	] 
+	interface IAVIDDSurfaceStream : IUnknown
+	{
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Create([in]LONG lParam1, [in]LONG lParam2);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Delete([in]LONG lStart, [in]LONG lSamples);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Info([out]AVISTREAMINFO* psi, [in]LONG lSize);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT FindSample([in]LONG lPos, [in]LONG lFlags, [out]LONG* lPosFound);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Read([in]LONG lStart, [in]LONG lSamples, [out]LPVOID lpBuffer, [in]LONG cbBuffer, 
+    				 [out]LONG* plBytes, [out]LONG* plSamples);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT ReadData([out]LPVOID lp, [out]LONG* lpcb);
+
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT ReadFormat([in]LONG lPos, [out]LPVOID lpFormat, [out]LONG* lpcbFormat);
+
+	[helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT SetFormat([in]LONG lPos, [in]LPVOID lpFormat, [in]LONG cbFormat);
+
+
+	[helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Write([in]LONG lStart, [in]LONG lSamples, [in]LPVOID lpBuffer, [in]LONG cbBuffer, 
+					  [in]DWORD dwFlags, [out]LONG* plSampWritten, [out]LONG* plBytesWritten); 
+
+
+	[helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT WriteData([in]LPVOID lpBuffer, [in]LONG cbBuffer);
+
+
+	[helpstring("Start compression with a given surface")] 		
+		HRESULT StartCompression([in] LPDIRECTDRAWSURFACE lpDDSurface);
+
+	[helpstring("Get a compressed video frame packaged in a DirectDrawSurface")] 		
+		HRESULT GetFrame([in]LONG lPos);
+
+	[helpstring("Get a video palette packaged in a DirectDraw palette")] 		
+		HRESULT GetPalette([in] LPDIRECTDRAWPALETTE lpDDPalette, [in]LONG lPos);
+
+	[helpstring("End compression")] 		
+		HRESULT EndCompression(void);
+
+
+
+	}// end of interface IAVIDDSurfaceStream definition
+	typedef IAVIDDSurfaceStream *LPAVIDDSURFACESTREAM;   
+
+
+	//=======================================================================================
+	// IAVIDirectSoundStream Interface 
+	// 			Comments:
+	//					This interface is used to access a sound stream using DirectSound
+	//=======================================================================================
+	[ 	
+	uuid(0C6E5C61-017E-11cf-B750-444553540000),
+	helpstring("Definition of interface IAVIDirectSoundStream"),
+	odl
+	] 
+	interface IAVIDirectSoundStream : IUnknown
+	{
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Create([in]LONG lParam1, [in]LONG lParam2);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Delete([in]LONG lStart, [in]LONG lSamples);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Info([out]AVISTREAMINFO* psi, [in]LONG lSize);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT FindSample([in]LONG lPos, [in]LONG lFlags, [out]LONG* lPosFound);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Read([in]LONG lStart, [in]LONG lSamples, [out]LPVOID lpBuffer, [in]LONG cbBuffer, 
+    				 [out]LONG* plBytes, [out]LONG* plSamples);
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT ReadData([out]LPVOID lp, [out]LONG* lpcb);
+
+
+    [helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT ReadFormat([in]LONG lPos, [out]LPVOID lpFormat, [out]LONG* lpcbFormat);
+
+	[helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT SetFormat([in]LONG lPos, [in]LPVOID lpFormat, [in]LONG cbFormat);
+
+
+	[helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT Write([in]LONG lStart, [in]LONG lSamples, [in]LPVOID lpBuffer, [in]LONG cbBuffer, 
+					  [in]DWORD dwFlags, [out]LONG* plSampWritten, [out]LONG* plBytesWritten); 
+
+
+	[helpstring("See IAVIStream interface in Windows API help")] 		
+		HRESULT WriteData([in]LPVOID lpBuffer, [in]LONG cbBuffer);
+
+
+	[helpstring("Start compression with a given sound buffer")] 		
+		HRESULT StartCompression([in] LPDIRECTSOUNDBUFFER lpDirectSoundBuffer); 
+
+	[helpstring("Get a compressed audio sample packaged in a DirectSoundBuffer object")] 		
+		HRESULT GetAudioSample( [in]LONG lPos, [in]LONG lLength, [in]DWORD dwSampleSize );
+
+
+	[helpstring("End compression")] 		
+		HRESULT EndCompression(void);
+
+
+
+	}// end of interface IAVIDirectSoundStream definition
+	typedef IAVIDirectSoundStream *LPAVIDIRECTSOUNDSTREAM;   
+
+
+	//=======================================================================================
+	// IAVISpriteFile Interface 
+	// 			Comments:
+	//					This interface is used to access a video sprite AVI file
+	//=======================================================================================
+	[ 	
+	uuid(2C84D940-FB37-11ce-B750-444553540000),
+	helpstring("Definition of interface IAVISpriteFile"),
+	odl
+	] 
+	interface IAVISpriteFile : IUnknown
+	{
+
+    [helpstring("See IAVIFile interface in Windows API help")] 		
+		HRESULT Info( [out] AVIFILEINFO* pfi,[in] LONG lSize);
+
+    [helpstring("See IAVIFile interface in Windows API help")] 		
+		HRESULT GetStream( [out] PAVISTREAM* ppStream,[in] DWORD fccType, [in] LONG lParam);
+
+    [helpstring("See IAVIFile interface in Windows API help")] 		
+		HRESULT CreateStream( [out] PAVISTREAM* ppStream,[in] AVISTREAMINFO* psi);
+
+    [helpstring("See IAVIFile interface in Windows API help")] 		
+		HRESULT WriteData( [in] DWORD ckid, [in] LPVOID lpData, [in] LONG cbData);
+
+    [helpstring("See IAVIFile interface in Windows API help")] 		
+		HRESULT ReadData( [in] DWORD ckid, [out] LPVOID lpData, [out] LONG* lpcbData);
+
+    [helpstring("See IAVIFile interface in Windows API help")] 		
+		HRESULT EndRecord(void);
+
+	[helpstring("Create a new chroma key stream with a given rate")] 		
+		HRESULT CreateChromaKeyStream( [out]PAVISTREAM* ppAVIStream, [in]DWORD dwRate );
+
+	[helpstring("Create a new video sprite path stream with a given rate")] 		
+		HRESULT CreatePathStream( [out]PAVISTREAM* ppAVIStream, [in]DWORD dwRate );
+
+	[helpstring("Create a new video stream based on DirectDraw Surfaces")] 		
+		HRESULT CreateDDSurfaceStream( [out]LPAVIDDSURFACESTREAM* ppAVIDDSurfaceStream, [in]DWORD dwRate );
+
+	[helpstring("Create a new sound stream based on DirectSound")] 		
+		HRESULT CreateDirectSoundStream( [out]LPAVIDIRECTSOUNDSTREAM* ppAVIDSoundStream, [in]DWORD dwRate );
+
+	[helpstring("Get a chroma key stream with a given stream number")] 		
+		HRESULT GetChromaKeyStream( [out]PAVISTREAM* ppAVIStream, [in]DWORD dwNumber );
+
+	[helpstring("Get a video sprite path stream with a stream number")] 		
+		HRESULT GetPathStream( [out]PAVISTREAM* ppAVIStream, [in]DWORD dwNumber );
+
+	[helpstring("Get a video stream based on DirectDraw Surfaces")] 		
+		HRESULT GetDDSurfaceStream( [out]LPAVIDDSURFACESTREAM* ppAVIDDSurfaceStream, [in]DWORD dwNumber );
+
+	[helpstring("Get a sound stream based on DirectSound")] 		
+		HRESULT GetDirectSoundStream( [out]LPAVIDIRECTSOUNDSTREAM* ppAVIDSoundStream, [in]DWORD dwNumber );
+
+
+
+	}// end of interface IAVISpriteFile definition
+	typedef IAVISpriteFile *LPAVISPRITEFILE;   
+
+	
+
+
+	//=======================================================================================
+	// ILinkSurface Interface 
+	// 			Comments:
+	//					This interface is used to link a surface COM type to a COM object.
+	//=======================================================================================
+	[ 	
+	uuid(8F03D841-D009-11ce-A1EC-444553540000),
+	helpstring("Definition of interface ILinkSurface"),
+	odl
+	] 
+	interface ILinkSurface : IUnknown
+	{
+	[helpstring("link to this component an other one and cache it's interface pointer")] 		
+		HRESULT Link([in]LPSURFACE pSurface); 	// Pointer to an interface. This interface is kept as an interface cache
+												// for further references. 
+	[helpstring("unlink the previously linked component")] 		
+		HRESULT Unlink(void);
+	 }// end of interface ILinkSurface definition
+	typedef ILinkSurface *LPLINKSURFACE;   
+	
+	//===================================================================================
+	//	IAbstractNode Interface
+	//
+	//		Comments:
+	//				This interface is used by collection object as a bridge between itself
+	//				and the component. It will aggregate the object 
+	//=======================================================================================
+	[
+	    odl,
+        uuid(3CA76640-AE0B-11CE-B979-838A92D8A9BD), 
+        helpstring("Definition of interface IAbstractNode")
+    ] 
+    interface IAbstractNode : ILinkComponent
+    {
+	[helpstring("Get next abstract node")] 		
+		HRESULT GetNext([out]IAbstractNode** pNode,	// pointer to the next abstract node
+						[out]LPVOID* pInterface);	// pointer to the cached interface through AggregateComponent
+	[helpstring("Get previous abstract node")] 		
+		HRESULT GetPrevious([out]IAbstractNode** pNode, // pointer to the previous abstract node
+							[out]LPVOID* pInterface);	// pointer to the cached interface through AggregateComponent
+	[helpstring("Get interface cached by IAggregateSingle interface")] 		
+		HRESULT GetCachedInterface([out]LPVOID* pInterface);// pointer to the cached interface through AggregateComponent
+	 }// end of interface IAbstractNode definition
+	typedef IAbstractNode *LPABSTRACTNODE;   
+
+	//=======================================================================================
+	// IEditAbstractNode Interface 
+	//
+	//		Comments:					   
+	//				This interface could be used only by Abstract collection Component
+	//				A QueryInterface on this interface from all other components will return
+	//				an error message.
+	//				This is a private interface used only by collection component. Access is
+	//				restricted for singleton components.
+	//=======================================================================================
+	[ 	
+		uuid(48F656E0-AE0B-11CE-B979-838A92D8A9BD),
+		helpstring("Definition of interface IEditAbstractNode"),
+		odl
+	] 
+	interface IEditAbstractNode : IAbstractNode
+	{
+	[helpstring("set next abstract node")] 		
+		HRESULT SetNext([in]LPABSTRACTNODE pNode);			// gives a pointer to the next abstract node
+	[helpstring("Set previous abstract node")] 		
+		HRESULT SetPrevious([in]LPABSTRACTNODE pNode); 	// gives a pointer to the previous abstract node
+	[helpstring("Get value of key of abstract node")] 		
+		HRESULT GetValueOfKey([out]LPVOID* pValue); 		// gives a value of key
+	[helpstring("Compare pValue with abstract node key")] 		
+		HRESULT CompareKey([in]LPVOID pValue); 				// gives a value of key to compare
+	[helpstring("Get type of key of abstract node")] 		
+		HRESULT GetTypeOfKey([out]int* pType); 				// gives a value of key
+    }// end of interface IEditAbstractNode definition
+	typedef IEditAbstractNode *LPEDITABSTRACTNODE;
+
+	//=======================================================================================
+	// IEditElementaryAbstract Interface 
+	//
+	//		Comments:					   
+	//				Cette interface est utilisée par le client qui désire manipuler une 
+	//				collection de type élémentaire (table, liste, ...).
+	//              Temporaire. 
+	//=======================================================================================
+	[
+	    odl,
+        uuid(2DA849C0-AE0B-11CE-B979-838A92D8A9BD), 
+        helpstring("Definition of interface IEditElementaryAbstract")
+    ] 
+    interface IEditElementaryAbstract : IUnknown
+    {
+	[helpstring("Set the cursor at first node of elementary abstract")]
+		HRESULT SetCursorAtFirstNode (void);
+	[helpstring("Set the cursor at last node of elementary abstract")]
+ 		HRESULT SetCursorAtLastNode (void);
+	[helpstring("Set the cursor at position of elementary abstract")]
+ 		HRESULT SetCursorAtPosition ([in] ULONG p_Position);
+	[helpstring("Set the cursor at node of elementary abstract")]
+ 		HRESULT SetCursorAt ([in] IAbstractNode* p_NodeIn);
+ 	[helpstring("Append node to elementary abstract")]
+ 		HRESULT AppendNode ([in] IAbstractNode* p_NodeIn);
+	[helpstring("Insert node at cursor position of elementary abstract")]
+		HRESULT InsertNodeAtCursor ([in] IAbstractNode* p_NodeIn);
+	[helpstring("Insert node at cursor position of elementary abstract")]
+		HRESULT InsertNodeAtPosition ([in] IAbstractNode* p_NodeIn, [in] ULONG p_Position);
+	[helpstring("Remove node to elementary abstract")]
+		HRESULT RemoveNode ([in] IAbstractNode* p_NodeIn);
+	[helpstring("Remove node at cursor position of elementary abstract")]
+		HRESULT RemoveNodeAtCursor ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Remove node at position of elementary abstract")]
+		HRESULT RemoveNodeAtPosition ([in] ULONG p_Position, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get first node of elementary abstract")]
+		HRESULT GetFirstNode ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get next node of cursor position of elementary abstract")]
+		HRESULT GetNextOfCurrentPosition ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get next node of node of elementary abstract")]
+		HRESULT GetNextOfNode ([in] IAbstractNode* p_NodeIn, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get previous node of cursor position of elementary abstract")]
+		HRESULT GetPreviousOfCurrentPosition ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get previous node of node of elementary abstract")]
+		HRESULT GetPreviousOfNode ([in] IAbstractNode* p_NodeIn, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get last node of elementary abstract")]
+		HRESULT GetLastNode ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get node at cursor position of elementary abstract")]
+		HRESULT GetCurrentPosition ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get node at position of elementary abstract")]
+		HRESULT GetNodeAtPosition ([in] ULONG p_Position, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get number of node of elementary abstract")]
+		HRESULT GetNumberOfNode ([out] ULONG* Nbr);
+	}// end of interface IEditElementaryAbstract definition
+	typedef IEditElementaryAbstract *LPEDITELEMENTARYABSTRACT;
+
+	//=======================================================================================
+	// IEditIndexAbstract Interface 
+	//
+	//		Comments:					   
+	//				Cette interface est utilisée par le client qui désire manipuler une 
+	//				collection de type index (arbre, ...).
+	//              Temporaire. 
+	//=======================================================================================
+	[
+	    odl,
+        uuid(06CB8EC0-AE0B-11CE-B979-838A92D8A9BD), 
+        helpstring("Definition of interface IEditElementaryAbstract")
+    ] 
+    interface IEditIndexAbstract : IUnknown
+    {
+	[helpstring("Set the cursor at first node of elementary abstract")]
+		HRESULT SetCursorAtFirstNode (void);
+	[helpstring("Set the cursor at last node of elementary abstract")]
+ 		HRESULT SetCursorAtLastNode (void);
+	[helpstring("Set the cursor at node of elementary abstract")]
+ 		HRESULT SetCursorAt ([in] IAbstractNode* p_NodeIn);
+	[helpstring("Insert node to elementary abstract")]
+		HRESULT InsertNode ([in] IAbstractNode* p_NodeIn);
+	[helpstring("Remove node to elementary abstract")]
+		HRESULT RemoveNode ([in] IAbstractNode* p_NodeIn);
+	[helpstring("Remove node at cursor position of elementary abstract")]
+		HRESULT RemoveNodeAtCursor ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get first node of elementary abstract")]
+		HRESULT GetFirstNode ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get next node of cursor position of elementary abstract")]
+		HRESULT GetNextOfCurrentPosition ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get next node of node of elementary abstract")]
+		HRESULT GetNextOfNode ([in] IAbstractNode* p_NodeIn, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get previous node of cursor position of elementary abstract")]
+		HRESULT GetPreviousOfCurrentPosition ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get previous node of node of elementary abstract")]
+		HRESULT GetPreviousOfNode ([in] IAbstractNode* p_NodeIn, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get last node of elementary abstract")]
+		HRESULT GetLastNode ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get node at cursor position of elementary abstract")]
+		HRESULT GetCurrentPosition ([out] IAbstractNode** p_NodeOut);
+	[helpstring("Get node at key position of elementary abstract")]
+		HRESULT GetNodeWithKey ([in] LPVOID p_Key, [out] IAbstractNode** p_NodeOut);
+	[helpstring("Get number of node of elementary abstract")]
+		HRESULT GetNumberOfNode ([out] ULONG* Nbr);
+	}// end of interface IEditIndexAbstract definition
+	typedef IEditIndexAbstract *LPEDITINDEXABSTRACT;
+
+	//=======================================================================================
+	// IBoundaryRectangle Interface 
+	//		Comments:
+	//				All boundary rectangles are in absolute units. This means that their
+	//				respective top leftmost position is relative to a geometrical universe.
+	//				For exemple, if the geometrical universea is a screen desktop, the 0,0
+	//				origin of this screen desktop is the top leftmost point. All boundary rectangles
+	//				contained in this area have their respective positions relative from this origin.
+
+	//=======================================================================================
+	[ 	
+	uuid(547DA321-C764-11ce-A1EC-444553540000),
+	helpstring("Definition of interface IBoundaryRectangle"),
+	odl
+	] 
+	interface IBoundaryRectangle : IUnknown
+	{
+	[helpstring("Set position and size of boundary rectangle")] 		
+		HRESULT Set([in]int Height,    // in pixel units
+			        [in]int Width,     //      idem
+			        [in]int XPos,      // in pixel unit from the screen upper left corner (0,0)
+			        [in]int YPos);     //      idem
+	[helpstring("Get position and size of boundary rectangle")] 		
+		HRESULT Get([out]int* Height,   // in pixel units
+			        [out]int* Width,    //      idem
+			        [out]int* Xpos,     // in pixel unit from the screen upper left corner (0,0)
+			        [out]int* YPos);    //      idem
+	[helpstring("Check if point is inside the boundary rectangle")] 		
+		HRESULT IsInside ([in]int XPos, 	// point's horizontal position
+						  [in]int YPos);	// point's vertical position 
+	}// end of interface IRectangle definition
+	typedef IBoundaryRectangle *LPBOUNDARYRECTANGLE;
+	
+	//=======================================================================================
+	// IName Interface 
+	//		Comments:
+	//				Names are strings ended by a NULL
+	//=======================================================================================
+	[ 	
+	uuid(5E2BA224-CF0F-11ce-A1EC-444553540000),
+	helpstring("Definition of interface IName"),
+	odl
+	] 
+	interface IName : IUnknown
+	{
+	[helpstring("Set name string")] 		
+		HRESULT SetNameOf([in]LPCTSTR Name);    		// pointer to an Array of char ended by a NULL
+	[helpstring("Get name string")] 		
+		HRESULT GetDisplayNameOf([out]LPCTSTR Name);	// pointer to an Array of char ended by a NULL
+	}// end of interface IName definition
+	typedef IName *LPNAME;
+
+ 	//=======================================================================================
+	// Interface IRectangleCollection
+	//=======================================================================================
+	[ 	
+	uuid(5E2BA227-CF0F-11ce-A1EC-444553540000),	
+	helpstring("Definition of interface IRectangleCollection"),
+	odl
+	] 
+	interface IRectangleCollection : IUnknown
+	{
+	[helpstring("X")] 
+		HRESULT New ([in]LPBOUNDRECT *pBoundRect,	// Boundary Rectangle structure in absolute coordinates 
+					 [in]int index, 				// z order position index 
+					 [in]LPUNKNOWN pInterface);		// Pointer to any component interface
+	[helpstring("X")] 
+		HRESULT Find ([in]int XPos,					// point's horizontal position in absolute coordinates
+					  [in]int YPos,					// point's vertical position in absolute coordinates
+					  [out]LPABSTRACTNODE pNode,	// retrun a pointer to boundary rectangle collection node
+					  [out]LPUNKNOWN pinterface);	// will return interface previously recorded with new
+	[helpstring("X")] 
+		HRESULT Remove ([in]LPABSTRACTNODE pNode);	// pointer to boundary rectangle node
+	}// end of interface IRectangleCollection definition
+	typedef IRectangleCollection *LPRECTANGLECOLLECTION;
+	
+	//=======================================================================================
+	// Interface IComponentFactory
+	//=======================================================================================
+	[ 	
+	uuid(522EAF22-CB4B-11ce-A1EC-444553540000),	
+	helpstring("Definition of interface IComponentFactory"),
+	odl
+	] 
+	interface IComponentFactory : IUnknown
+	{// Instance Constructor and destructor
+	[helpstring("Interactor handler constructor, parameter is a pointer to a structure")] 	
+		HRESULT Create([in]LPVOID CreationStructure );
+	[helpstring("Interactor handler destructor")] 	
+		HRESULT Destroy(void);
+	}// end of IComponentFactory definition
+	
+	typedef IComponentFactory *LPCOMPONENTFACTORY;
+	
+	//=======================================================================================
+	// Interface IUserEvent
+	//=======================================================================================
+	[ 	
+	uuid(547DA322-C764-11ce-A1EC-444553540000),
+	helpstring("Definition of interface IUserEvent"),
+	odl
+	] 
+	interface IUserEvent : IUnknown
+	{
+		// Left button on the mouse is used as a Selection cursor
+		[helpstring("Left button (select Cursor) is activated")] 
+			HRESULT SetMode([in]CURSOR CursorMode,  // Ex: RECT_SELECT, POINT_CLICK, etc...
+			                [in]int XPos,          // horizontal position from upper left screen origin (0,0)
+			                [in]int YPos);         // vertical position from upper left screen origin (0,0)
+			
+        // mouse events
+		[helpstring("Mouse move event")] 
+			HRESULT MouseMove(  [in]int XPos,    // horizontal position from upper left screen origin (0,0)
+			                    [in]int YPos);   // vertical position from upper left screen origin (0,0)
+	}// end of interface IUserEvent definition
+	typedef IUserEvent *LPUSEREVENT;
+
+  	//=======================================================================================
+	// Interface IWindow
+	//=======================================================================================
+	[ 	
+	uuid(522EAF20-CB4B-11ce-A1EC-444553540000),
+	helpstring("Definition of interface IWindow"),
+	odl
+	] 
+	interface IWindow : IBoundaryRectangle
+	{
+	[helpstring("Show a window object")] 	
+		HRESULT show(void);
+	[helpstring("Hide a window object")] 	
+		HRESULT Hide(void);
+	}// end of interface IWindow
+	typedef IWindow *LPWINDOW;
+
+   
+
+
+
+  	//=======================================================================================
+	// Interface ICompositeSurface
+	//=======================================================================================
+	[
+	uuid(2B4EDED4-BB8D-11ce-A2AC-524153480001),
+	helpstring("Definition of interface ICompositeSurface"),
+	odl             
+    ] 
+    interface ICompositeSurface: ISurface
+    {
+	[helpstring("Copy the surface using a KeyColor")]	
+		HRESULT TransBitBlt( [in] LPSURFACE pSurfaceSrc, [in] int Xdest, [in] int Ydest);  
+	[helpstring("Copy the surface without transparency")]
+		HRESULT OpaqueBitBlt( [in] LPSURFACE pSurfaceSrc, [in] int Xdest, [in] int Ydest);
+	[helpstring("Copy the surface with a ghost special effect")]
+		HRESULT GhostBitBlt( [in] LPSURFACE pSurfaceSrc, [in] int Xdest, [in] int Ydest, 
+								[in] int level);
+		 
+	[helpstring("Invalidate a surface area")]
+		HRESULT InvalidateSurface( [in] LPBOUNDRECT pDirtyRect ); 
+	}// end of interface ICompositeSurface 	
+	typedef ICompositeSurface *LPCOMPOSITESURFACE;
+
+	
+
+  	//=======================================================================================
+	// Interface IOffscreenSurface
+	//=======================================================================================
+	[
+	odl,
+    uuid(2B4EDED5-BB8D-11ce-A2AC-524153480001), 
+    helpstring("Offscreen surface access")
+    ] 
+    interface IOffscreenSurface: ISurface
+    {
+	[helpstring("Get WinG device context")]	
+		HRESULT GetWinGDC( [out] HDC* pdc );
+	[helpstring("Determine if a pixel at (x, y) is inside the region")]
+		HRESULT IsInside( [in] int x, [in] int y, [out] BOOL* Inside );
+	[helpstring("Map surface colors to a given palette")]
+		HRESULT MapToPalette( [in] HPALETTE hPalette );
+ 	[helpstring("Set a new key color")]	
+ 		HRESULT SetColorKey( [in] COLORREF KeyColor);
+	}// end of interface IOffscreenSurface 	
+	typedef IOffscreenSurface *LPOFFSCREENSURFACE;
+
+
+
+  	//=======================================================================================
+	// Interface IFlippableSurface
+	//=======================================================================================
+	[
+	odl,
+    uuid(2B4EDED6-BB8D-11ce-A2AC-524153480001),
+    helpstring("Flippable surface")
+    ] 
+    interface IFlippableSurface: ICompositeSurface
+    {
+ 	[helpstring("Flip the surface to the screen")]
+ 		HRESULT Flip([in]LPBOUNDRECT pDirtyRect);
+	[helpstring("Lock offscreen surface access")]
+		HRESULT Lock(void);
+	[helpstring("Unlock offscreen surface access")]
+		HRESULT Unlock(void);
+	[helpstring("Get Identity palette")]
+		HRESULT GetPalette([in] HPALETTE* phPalette);
+
+	}// end of interface IFlippableSurface
+	typedef IFlippableSurface *LPFLIPPABLESURFACE;
+ 
+
+/*>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> In construction <<<<<<<<<<<<<<<<<<<<<<<<<<<
+// All interfaces below are currently in discution do not take these as
+// given, they may change in the near future.
+
+	//=======================================================================================
+	// Interface ISpatialComponentCollection
+	//=======================================================================================
+	[ 	
+	uuid(7FF59301-CDB8-11ce-A1EC-444553540000),
+	helpstring("Definition of interface ISpatialComponentCollection"),
+	odl
+	] 
+	interface ISpatialKeyedCollection : IUnknown
+		{
+		// methods:
+		[helpstring("X")] 
+			RESULT Remove(LPVOID pObj);
+		[helpstring("X")] 
+			HRESULT Find(int XPos, int YPos, LPVOID *pObj);
+		[helpstring("X")] 
+			HRESULT Insert(LPRECTANGLENODE pRect, LPVOID *pObj);
+		[helpstring("X")] 
+			HRESULT MoveForward (LPRECTANGLENODE pRect);
+		[helpstring("X")] 
+			HRESULT MoveBackward (LPRECTANGLENODE pRect);
+		[helpstring("X")] 
+			HRESULT BringToFront (LPRECTANGLENODE pRect);
+		[helpstring("X")] 
+			HRESULT SendToBack (LPRECTANGLENODE pRect);
+		}// end of interface IEditRectangleCollection
+	
+	//=======================================================================================
+	// Interface INameComponentCollection
+	//=======================================================================================
+	[ 	
+	uuid(7FF59301-CDB8-11ce-A1EC-444553540000),
+	helpstring("Definition of interface ISpatialComponentCollection"),
+	odl
+	] 
+	interface INameKeyedCollection : IUnkown
+		{
+		// methods:
+		[helpstring("X")] 
+			RESULT Remove(LPNAMENODE pName);
+		[helpstring("X")] 
+			HRESULT Find(LPCSTR name, LPVOID *pObj);
+		[helpstring("X")] 
+			HRESULT Insert(LPNAMENODE pName);
+		}// end of interface IEditRectangleCollection
+  */
+
+  }; // end of library definition				  
