@@ -1,0 +1,39 @@
+// AVITest.odl : type library source for AVITest.exe
+
+// This file will be processed by the Make Type Library (mktyplib) tool to
+// produce the type library (AVITest.tlb).
+
+[ uuid(BC12FF81-FBE4-11CE-B750-444553540000), version(1.0) ]
+library AVITest
+{
+	importlib("stdole32.tlb");
+	
+	//  Primary dispatch interface for CAVITestDoc
+	
+	[ uuid(BC12FF82-FBE4-11CE-B750-444553540000) ]
+	dispinterface IAVITes
+	{
+		properties:
+			// NOTE - ClassWizard will maintain property information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_PROP(CAVITestDoc)
+			//}}AFX_ODL_PROP
+			
+		methods:
+			// NOTE - ClassWizard will maintain method information here.
+			//    Use extreme caution when editing this section.
+			//{{AFX_ODL_METHOD(CAVITestDoc)
+			//}}AFX_ODL_METHOD
+
+	};
+
+	//  Class information for CAVITestDoc
+	
+	[ uuid(BC12FF80-FBE4-11CE-B750-444553540000) ]
+	coclass CAVITestDoc
+	{
+		[default] dispinterface IAVITes;
+	};
+
+	//{{AFX_APPEND_ODL}}
+};
